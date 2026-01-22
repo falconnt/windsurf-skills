@@ -5,89 +5,169 @@ description: Use when completing tasks, implementing major features, or before m
 
 # Requesting Code Review
 
-Dispatch superpowers:code-reviewer subagent to catch issues before they cascade.
+Perform structured self-review to catch issues before they cascade.
 
 **Core principle:** Review early, review often.
 
 ## When to Request Review
 
 **Mandatory:**
-- After each task in subagent-driven development
 - After completing major feature
 - Before merge to main
+- After significant refactoring
 
 **Optional but valuable:**
 - When stuck (fresh perspective)
 - Before refactoring (baseline check)
 - After fixing complex bug
 
-## How to Request
+## How to Perform Review
 
-**1. Get git SHAs:**
+**1. Get git diff for review:**
 ```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
-HEAD_SHA=$(git rev-parse HEAD)
+# Compare against main/master
+git diff main --stat
+git diff main
+
+# Or compare specific commits
+git diff HEAD~3..HEAD --stat
+git diff HEAD~3..HEAD
 ```
 
-**2. Dispatch code-reviewer subagent:**
+**2. Follow the review checklist below systematically**
 
-Use Task tool with superpowers:code-reviewer type, fill template at `code-reviewer.md`
+**3. Document findings using the output format**
 
-**Placeholders:**
-- `{WHAT_WAS_IMPLEMENTED}` - What you just built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
-- `{DESCRIPTION}` - Brief summary
-
-**3. Act on feedback:**
+**4. Act on findings:**
 - Fix Critical issues immediately
 - Fix Important issues before proceeding
 - Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+
+## Review Checklist
+
+### Code Quality
+- [ ] Clean separation of concerns?
+- [ ] Proper error handling?
+- [ ] Type safety (if applicable)?
+- [ ] DRY principle followed?
+- [ ] Edge cases handled?
+
+### Architecture
+- [ ] Sound design decisions?
+- [ ] Scalability considerations?
+- [ ] Performance implications?
+- [ ] Security concerns addressed?
+
+### Testing
+- [ ] Tests actually test logic (not mocks)?
+- [ ] Edge cases covered?
+- [ ] Integration tests where needed?
+- [ ] All tests passing?
+
+### Requirements
+- [ ] All plan requirements met?
+- [ ] Implementation matches spec?
+- [ ] No scope creep?
+- [ ] Breaking changes documented?
+
+### Production Readiness
+- [ ] Migration strategy (if schema changes)?
+- [ ] Backward compatibility considered?
+- [ ] Documentation complete?
+- [ ] No obvious bugs?
+
+## Output Format
+
+Document your review findings:
+
+```markdown
+## Code Review: [Feature/Task Name]
+
+**Reviewed:** [date]
+**Commits:** [base]...[head]
+
+### Strengths
+[What's well done? Be specific with file:line references]
+
+### Issues
+
+#### Critical (Must Fix)
+[Bugs, security issues, data loss risks, broken functionality]
+
+#### Important (Should Fix)
+[Architecture problems, missing features, poor error handling, test gaps]
+
+#### Minor (Nice to Have)
+[Code style, optimization opportunities, documentation improvements]
+
+### Assessment
+**Ready to merge:** [Yes/No/With fixes]
+**Reasoning:** [Technical assessment in 1-2 sentences]
+```
+
+**For each issue include:**
+- File:line reference
+- What's wrong
+- Why it matters
+- How to fix (if not obvious)
 
 ## Example
 
 ```
-[Just completed Task 2: Add verification function]
+[Just completed: Add verification function]
 
-You: Let me request code review before proceeding.
+You: Let me review my changes before proceeding.
 
-BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | awk '{print $1}')
-HEAD_SHA=$(git rev-parse HEAD)
+$ git diff main --stat
+ src/indexer.ts     | 45 +++++++++++++++
+ src/verifier.ts    | 82 +++++++++++++++++++++++++
+ tests/verifier.test.ts | 67 ++++++++++++++++++++
+ 3 files changed, 194 insertions(+)
 
-[Dispatch superpowers:code-reviewer subagent]
-  WHAT_WAS_IMPLEMENTED: Verification and repair functions for conversation index
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/plans/deployment-plan.md
-  BASE_SHA: a7981ec
-  HEAD_SHA: 3df7661
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
+[Review against checklist...]
 
-[Subagent returns]:
-  Strengths: Clean architecture, real tests
-  Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
+## Code Review: Verification Functions
 
-You: [Fix progress indicators]
-[Continue to Task 3]
+### Strengths
+- Clean architecture with proper separation (verifier.ts)
+- Good test coverage (67 lines, all edge cases)
+- Proper error handling with fallbacks (verifier.ts:45-52)
+
+### Issues
+
+#### Important
+1. **Missing progress indicators**
+   - File: indexer.ts:130
+   - Issue: No feedback during long operations
+   - Fix: Add progress callback or logging
+
+#### Minor
+1. **Magic number**
+   - File: verifier.ts:23
+   - Issue: Hardcoded 100 for reporting interval
+   - Fix: Extract to named constant
+
+### Assessment
+**Ready to merge:** With fixes
+**Reasoning:** Core implementation solid. Progress indicator is important for UX.
+
+[Fix progress indicators]
+[Continue to next task]
 ```
 
 ## Integration with Workflows
 
-**Subagent-Driven Development:**
-- Review after EACH task
-- Catch issues before they compound
-- Fix before moving to next task
-
 **Executing Plans:**
 - Review after each batch (3 tasks)
-- Get feedback, apply, continue
+- Document findings, apply fixes, continue
 
 **Ad-Hoc Development:**
 - Review before merge
 - Review when stuck
+
+**Feature Development:**
+- Review after each logical milestone
+- Catch issues before they compound
 
 ## Red Flags
 
@@ -95,11 +175,10 @@ You: [Fix progress indicators]
 - Skip review because "it's simple"
 - Ignore Critical issues
 - Proceed with unfixed Important issues
-- Argue with valid technical feedback
+- Rush through checklist
 
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
-
-See template at: requesting-code-review/code-reviewer.md
+**Quality indicators:**
+- Every checklist item considered
+- Specific file:line references
+- Clear severity categorization
+- Honest assessment
