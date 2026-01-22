@@ -45,8 +45,8 @@ Based on feedback:
 ### Step 5: Complete Development
 
 After all tasks complete and verified:
-- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- Use @finishing-a-development-branch skill
+- Announce: "I'm using the finishing-branch skill to complete this work."
+- Use @finishing-branch skill
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help

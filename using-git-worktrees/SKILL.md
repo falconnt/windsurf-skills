@@ -215,5 +215,5 @@ Ready to implement auth feature
 - Any skill needing isolated workspace
 
 **Pairs with:**
-- **@finishing-a-development-branch** - For cleanup after work complete
+- **@finishing-branch** - For cleanup after work complete
 - **@executing-plans** - Work happens in this worktree
