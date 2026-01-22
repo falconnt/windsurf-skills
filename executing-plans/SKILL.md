@@ -1,6 +1,6 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: Use when you have a written implementation plan to execute with review checkpoints
 ---
 
 # Executing Plans
@@ -46,7 +46,7 @@ Based on feedback:
 
 After all tasks complete and verified:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
+- Use @finishing-a-development-branch skill
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help

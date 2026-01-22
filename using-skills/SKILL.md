@@ -1,6 +1,6 @@
 ---
-name: using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+name: using-skills
+description: Use when starting any conversation - establishes how to find and use skills before ANY response including clarifying questions
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -11,11 +11,15 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
-## How to Access Skills
+## How to Access Skills in Windsurf
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+**Automatic discovery:** Skills are discovered from `~/.codeium/windsurf/skills/` and project `.windsurf/workflows/`.
 
-**In other environments:** Check your platform's documentation for how skills are loaded.
+**Manual invocation:** Use `@skill-name` syntax to explicitly invoke a skill.
+
+**Important:** Automatic skill invocation can be unreliable in Windsurf. When reliability matters, always use explicit `@skill-name` invocation.
+
+**Skill tool:** Use the `skill` tool to invoke skills by name when available.
 
 # Using Skills
 
@@ -23,27 +27,14 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 **Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
 
-```dot
-digraph skill_flow {
-    "User message received" [shape=doublecircle];
-    "Might any skill apply?" [shape=diamond];
-    "Invoke Skill tool" [shape=box];
-    "Announce: 'Using [skill] to [purpose]'" [shape=box];
-    "Has checklist?" [shape=diamond];
-    "Create TodoWrite todo per item" [shape=box];
-    "Follow skill exactly" [shape=box];
-    "Respond (including clarifications)" [shape=doublecircle];
-
-    "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
-    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
-    "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
-    "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Create TodoWrite todo per item" -> "Follow skill exactly";
-}
-```
+**Process:**
+1. User message received
+2. Check: Might any skill apply? (even 1% chance = yes)
+3. If yes: Invoke skill via `skill` tool or read skill file
+4. Announce: "Using [skill] to [purpose]"
+5. If skill has checklist: Create todo per item
+6. Follow skill exactly
+7. Respond to user
 
 ## Red Flags
 

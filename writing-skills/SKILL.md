@@ -9,13 +9,16 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-**Personal skills live in agent-specific directories (`~/.claude/skills` for Claude Code, `~/.codex/skills` for Codex)** 
+**Personal skills live in agent-specific directories:**
+- **Windsurf:** `~/.codeium/windsurf/skills/`
+- **Claude Code:** `~/.claude/skills/`
+- **Codex:** `~/.codex/skills/` 
 
-You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
+You write test cases (pressure scenarios), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
 **Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
 
-**REQUIRED BACKGROUND:** You MUST understand superpowers:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
+**REQUIRED BACKGROUND:** You MUST understand @test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
 
 **Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
 
@@ -31,7 +34,7 @@ A **skill** is a reference guide for proven techniques, patterns, or tools. Skil
 
 | TDD Concept | Skill Creation |
 |-------------|----------------|
-| **Test case** | Pressure scenario with subagent |
+| **Test case** | Pressure scenario in conversation |
 | **Production code** | Skill document (SKILL.md) |
 | **Test fails (RED)** | Agent violates rule without skill (baseline) |
 | **Test passes (GREEN)** | Agent complies with skill present |
@@ -55,7 +58,7 @@ The entire skill creation process follows RED-GREEN-REFACTOR.
 **Don't create for:**
 - One-off solutions
 - Standard practices well-documented elsewhere
-- Project-specific conventions (put in CLAUDE.md)
+- Project-specific conventions (put in project rules/memories)
 - Mechanical constraints (if it's enforceable with regex/validation, automate it—save documentation for judgment calls)
 
 ## Skill Types
@@ -536,28 +539,30 @@ Follow the TDD cycle:
 
 ### RED: Write Failing Test (Baseline)
 
-Run pressure scenario with subagent WITHOUT the skill. Document exact behavior:
-- What choices did they make?
+Run pressure scenario WITHOUT the skill loaded. Document exact behavior:
+- What choices did the agent make?
 - What rationalizations did they use (verbatim)?
 - Which pressures triggered violations?
 
 This is "watch the test fail" - you must see what agents naturally do before writing the skill.
 
+**In Windsurf:** Start a new conversation without invoking the skill. Present the pressure scenario and document behavior.
+
 ### GREEN: Write Minimal Skill
 
 Write skill that addresses those specific rationalizations. Don't add extra content for hypothetical cases.
 
-Run same scenarios WITH skill. Agent should now comply.
+Run same scenarios WITH skill loaded (use `@skill-name`). Agent should now comply.
 
 ### REFACTOR: Close Loopholes
 
 Agent found new rationalization? Add explicit counter. Re-test until bulletproof.
 
-**Testing methodology:** See @testing-skills-with-subagents.md for the complete testing methodology:
-- How to write pressure scenarios
-- Pressure types (time, sunk cost, authority, exhaustion)
-- Plugging holes systematically
-- Meta-testing techniques
+**Testing methodology:**
+- Create pressure scenarios combining multiple pressures (time, sunk cost, authority, exhaustion)
+- Test without skill → document failures
+- Test with skill → verify compliance
+- Iterate until bulletproof
 
 ## Anti-Patterns
 
