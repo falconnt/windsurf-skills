@@ -170,6 +170,15 @@ function MyComponent() {
 - `tokens.colorPaletteRedBackground3` - Error states
 - `tokens.colorPaletteGreenBackground3` - Success states
 
+### Color Token Discovery
+
+Palette color tokens don't follow a uniform naming pattern. When a token doesn't exist:
+
+- Use TypeScript autocomplete to explore available tokens
+- Try variations: `Border`, `BorderActive`, `Foreground`, `Background` + numbers (1, 2, 3)
+- Example: `colorPaletteBlueBorder2` doesn't exist → try `colorPaletteBlueForeground2` or `colorPaletteBlueBorderActive`
+- Available palettes: `Red`, `Green`, `Blue`, `Yellow`, `DarkOrange`, `Marigold`, `Teal`, `Purple`, etc.
+
 ### Typography
 
 - `tokens.fontSizeBase100` through `tokens.fontSizeBase600`
