@@ -11,6 +11,10 @@ description: Use when upgrading .NET Framework (3.5, 4.x) to modern .NET (6, 8, 
 
 **Core principle:** Prepare meticulously, let AI automate transformations, validate obsessively.
 
+**Iron rule:** After EVERY step, the application must compile, run, and pass all tests. Never proceed with a broken build. If tests fail, fix before continuing.
+
+**First step:** Create a dedicated migration branch (or git worktree) before touching any code. This keeps main stable, enables easy rollback, and allows parallel development to continue.
+
 **Expected gains:** 30-50% performance improvement, 40-60% memory reduction, modern security features.
 
 ## When to Use
@@ -80,7 +84,34 @@ Create `Directory.Packages.props` at solution root:
 
 ## Migration Strategy
 
+### The Step-by-Step Principle
+
+**CRITICAL:** Migration is NOT a big-bang rewrite. Each step must leave the application in a working state.
+
+```
+For each migration step:
+1. Make ONE focused change
+2. Build → must succeed
+3. Run tests → must pass
+4. Commit to Git (checkpoint)
+5. Verify application runs correctly
+6. ONLY THEN proceed to next step
+```
+
+**Why this matters:**
+- If something breaks, you know exactly which change caused it
+- Rollback is always one commit away
+- Functionality drift is caught immediately
+- Team can review incremental changes
+
+**Red flag:** If you find yourself making multiple unrelated changes before testing, STOP. You've lost the safety net.
+
 ### Phase 1: Shared Libraries (2-4 weeks typical)
+
+Migrate ONE library at a time. After each library:
+- ✅ Build entire solution
+- ✅ Run all tests
+- ✅ Commit
 
 1. Target .NET Standard 2.0 for dual compatibility
 2. Multi-target to support both old and new hosts:
@@ -97,23 +128,29 @@ Create `Directory.Packages.props` at solution root:
 
 ### Phase 2: Data Access Layer
 
+Migrate ONE repository/context at a time. Verify queries return same results.
+
 - **EF6 → EF Core:** Different query behavior, especially lazy loading and raw SQL
 - Test all queries—don't assume equivalent behavior
 - Consider database migration for licensing cost reduction
 
 ### Phase 3: Business Logic
 
+Migrate ONE service at a time. Keep interfaces stable.
+
 - Usually migrates cleanly
 - Watch for: Registry access, Windows paths, COM interop
 
 ### Phase 4: Application Entry Point
 
-For ASP.NET → ASP.NET Core:
+For ASP.NET → ASP.NET Core (incremental with YARP):
 
-1. Create new ASP.NET Core project
+1. Create new ASP.NET Core project alongside existing
 2. Set up YARP reverse proxy to route between old/new
-3. Migrate routes incrementally
-4. Remove old routes as new ones are validated
+3. Migrate ONE route/controller at a time
+4. Test each migrated route thoroughly
+5. Remove old route only after new one is validated
+6. Repeat until all routes migrated
 
 ## Tools
 
@@ -299,11 +336,17 @@ ALTER ROLE db_owner ADD MEMBER [your-app-name];
 - [ ] Azure Key Vault access confirmed
 - [ ] Dedicated migration branch created
 
-### Execution
+### Execution (One Step at a Time)
 - [ ] Invoke GitHub Copilot app modernization
 - [ ] Review generated plan before proceeding
-- [ ] Monitor and intervene when needed
-- [ ] Migrate shared libraries → data layer → business logic → entry point
+- [ ] **For EACH migration step:**
+  - [ ] Make one focused change
+  - [ ] Build entire solution (must succeed)
+  - [ ] Run all tests (must pass)
+  - [ ] Verify application runs correctly
+  - [ ] Commit to Git (checkpoint)
+  - [ ] ONLY THEN proceed to next step
+- [ ] Migrate: shared libraries → data layer → business logic → entry point
 - [ ] Implement Zero Trust security (Managed Identity, Key Vault)
 - [ ] Update CI/CD pipelines
 
