@@ -247,7 +247,7 @@ How Cascade finds and uses your skills:
 
 ## This Repository's Skills
 
-### ✅ Fully Compatible Skills (12 total)
+### ✅ Fully Compatible Skills (14 total)
 
 All skills in this repository have been adapted for Windsurf compatibility:
 
@@ -267,6 +267,10 @@ All skills in this repository have been adapted for Windsurf compatibility:
 #### Development Practices (2 skills)
 - **`using-git-worktrees`** - Isolated workspace management
 - **`writing-skills`** - Create new skills using TDD
+
+#### Design & UI (2 skills)
+- **`designing-frontends`** - Creative direction, bold aesthetics, unique visual identity
+- **`ui-ux-pro-max`** - Systematic UX rules, accessibility, pre-delivery checklists
 
 #### Meta Skills (1 skill)
 - **`using-skills`** - How to find and use skills
