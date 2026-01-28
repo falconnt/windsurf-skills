@@ -63,7 +63,7 @@ Create 3-4 icon concepts as SVG files. Consider the app's purpose and brand.
 ### Save Multiple Options
 
 ```
-docs/plans/image/icon-designs/
+.scripts/generating-app-icons/
 ├── option-1-symbolic.svg
 ├── option-2-metaphor.svg
 ├── option-3-abstract.svg
@@ -145,7 +145,10 @@ const pngFiles = [
 createIco(pngFiles, 'AppIcon.ico');
 ```
 
-Run with: `node create-ico.js`
+Save as `.scripts/generating-app-icons/create-ico.js` and run:
+```bash
+node .scripts/generating-app-icons/create-ico.js
+```
 
 ## Red Flags
 

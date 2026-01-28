@@ -105,6 +105,20 @@ Skills can include additional files for:
 
 Keep inline: Principles, concepts, short code patterns (<50 lines)
 
+### Runtime Scripts Location
+
+When a skill needs to create scripts, temporary files, or generated artifacts during execution, place them in:
+
+```
+.scripts/<skill-name>/
+```
+
+**Examples:**
+- `generating-app-icons` creates conversion scripts → `.scripts/generating-app-icons/create-ico.js`
+- `migrating-dotnet` creates migration helpers → `.scripts/migrating-dotnet/analyze.ps1`
+
+**Why:** Keeps workspace clean by isolating skill-generated files from project source code. The `.scripts` folder can be gitignored if desired.
+
 ## Creating Skills
 
 ### Skill Types

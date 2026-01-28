@@ -370,9 +370,30 @@ pptx/
   SKILL.md       # Overview + workflows
   pptxgenjs.md   # 600 lines API reference
   ooxml.md       # 500 lines XML structure
-  scripts/       # Executable tools
 ```
 When: Reference material too large for inline
+
+### Runtime Scripts Location
+
+When a skill creates scripts or temporary files **during execution**, place them in:
+
+```
+.scripts/<skill-name>/
+```
+
+**NOT in the skill folder** (those are static reference files).
+**NOT in project folders** (pollutes workspace).
+
+**Example:** `generating-app-icons` skill creates:
+```
+.scripts/generating-app-icons/
+  create-ico.js      # Conversion script
+  icon-256.png       # Generated artifacts
+  icon-64.png
+  preview.html       # Temporary preview
+```
+
+**Why:** Keeps workspace clean. The `.scripts` folder can be gitignored.
 
 ## The Iron Law (Same as TDD)
 
