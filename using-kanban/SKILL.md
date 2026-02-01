@@ -142,32 +142,49 @@ Used in epics and features to structure decisions:
 
 ## ID Generation
 
-**CRITICAL: Always check existing IDs before creating new items to prevent duplicates.**
+**CRITICAL: Use the ID counter file to ensure unique numbering.**
 
-Before creating any item, scan the `.kanban/` folder for existing IDs:
+### Counter File: `.kanban/_counters.yaml`
 
-```bash
-# Find all existing epic IDs
-find .kanban/epics -name "_epic.md" -exec grep "^id:" {} \;
+This file tracks the last used ID for each work item type:
 
-# Find all existing feature IDs
-find .kanban/epics -name "_feature.md" -exec grep "^id:" {} \;
-
-# Find all existing story/bugfix/task IDs
-find .kanban -name "*.md" -exec grep "^id:" {} \;
+```yaml
+# .kanban/_counters.yaml
+# Last assigned ID numbers - DO NOT manually edit
+epic: 3
+feature: 12
+story: 45
+bugfix: 8
+task: 67
 ```
 
-**ID format:** `<type>-<number>` where number is zero-padded (e.g., `epic-001`, `feature-012`, `story-103`)
+### Process
 
-**Process:**
-1. Scan existing items of that type across ALL epics/features
-2. Find the highest existing number
-3. Increment by 1 for the new item
-4. Validate the new ID doesn't exist anywhere
+1. **Read** `.kanban/_counters.yaml` (create if missing with all zeros)
+2. **Increment** the counter for the item type
+3. **Generate ID** using format `<type>-<number>` (zero-padded to 3 digits)
+4. **Update** the counter file with new value
+5. **Create** the work item with the new ID
+
+**ID format:** `<type>-<number>` (e.g., `epic-001`, `feature-012`, `story-046`)
+
+### Initialize Counter File
+
+If `.kanban/_counters.yaml` doesn't exist, create it:
+
+```yaml
+# .kanban/_counters.yaml
+# Last assigned ID numbers - DO NOT manually edit
+epic: 0
+feature: 0
+story: 0
+bugfix: 0
+task: 0
+```
 
 ## Best Practices
 
-1. **Check existing IDs** before creating any new item
+1. **Use `_counters.yaml`** to get next ID (never manually assign)
 2. **Start with Epic** for large initiatives
 3. **Break down** epics into features before implementation
 4. **Keep tasks small** (< 1 day)
@@ -179,7 +196,7 @@ find .kanban -name "*.md" -exec grep "^id:" {} \;
 
 | Mistake | Fix |
 |---------|-----|
-| **Reusing existing IDs** | Scan ALL existing items before generating new ID |
+| **Reusing existing IDs** | Always use `_counters.yaml` to get next ID |
 | Creating files in wrong location | Always use `<PROJECT_ROOT>/.kanban/` |
 | Skipping acceptance criteria | Define criteria before implementation |
 | Features too large | Decompose into 3-7 stories |
