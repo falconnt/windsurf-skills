@@ -140,19 +140,46 @@ Used in epics and features to structure decisions:
 2. **3 Options** - Quick/Simple, Balanced, Comprehensive approaches
 3. **1 Recommendation** - Best approach with reasoning
 
+## ID Generation
+
+**CRITICAL: Always check existing IDs before creating new items to prevent duplicates.**
+
+Before creating any item, scan the `.kanban/` folder for existing IDs:
+
+```bash
+# Find all existing epic IDs
+find .kanban/epics -name "_epic.md" -exec grep "^id:" {} \;
+
+# Find all existing feature IDs
+find .kanban/epics -name "_feature.md" -exec grep "^id:" {} \;
+
+# Find all existing story/bugfix/task IDs
+find .kanban -name "*.md" -exec grep "^id:" {} \;
+```
+
+**ID format:** `<type>-<number>` where number is zero-padded (e.g., `epic-001`, `feature-012`, `story-103`)
+
+**Process:**
+1. Scan existing items of that type across ALL epics/features
+2. Find the highest existing number
+3. Increment by 1 for the new item
+4. Validate the new ID doesn't exist anywhere
+
 ## Best Practices
 
-1. **Start with Epic** for large initiatives
-2. **Break down** epics into features before implementation
-3. **Keep tasks small** (< 1 day)
-4. **Document acceptance criteria** for stories/bugfixes
-5. **Update states** to reflect actual progress
-6. **Use tags** for cross-cutting concerns (security, performance)
+1. **Check existing IDs** before creating any new item
+2. **Start with Epic** for large initiatives
+3. **Break down** epics into features before implementation
+4. **Keep tasks small** (< 1 day)
+5. **Document acceptance criteria** for stories/bugfixes
+6. **Update states** to reflect actual progress
+7. **Use tags** for cross-cutting concerns (security, performance)
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
+| **Reusing existing IDs** | Scan ALL existing items before generating new ID |
 | Creating files in wrong location | Always use `<PROJECT_ROOT>/.kanban/` |
 | Skipping acceptance criteria | Define criteria before implementation |
 | Features too large | Decompose into 3-7 stories |
