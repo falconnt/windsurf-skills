@@ -140,6 +140,44 @@ Used in epics and features to structure decisions:
 2. **3 Options** - Quick/Simple, Balanced, Comprehensive approaches
 3. **1 Recommendation** - Best approach with reasoning
 
+## Pre-Creation Checklist
+
+**BEFORE creating ANY kanban items, complete these steps:**
+
+### Step 1: Read or Create Counter File
+
+```bash
+# Check if counter file exists
+cat .kanban/_counters.yaml
+```
+
+If file doesn't exist:
+1. **Scan ALL existing items** to find highest IDs
+2. Create counter file with discovered values
+
+```bash
+# Find highest IDs (example grep commands)
+grep -r "^id: epic-" .kanban/ | sort -t'-' -k2 -n | tail -1
+grep -r "^id: feature-" .kanban/ | sort -t'-' -k2 -n | tail -1
+grep -r "^id: story-" .kanban/ | sort -t'-' -k2 -n | tail -1
+grep -r "^id: task-" .kanban/ | sort -t'-' -k2 -n | tail -1
+```
+
+### Step 2: Reserve ID Range
+
+Before creating files, plan all IDs upfront:
+
+| Item Type | Current Counter | Items to Create | Reserved Range |
+|-----------|-----------------|-----------------|----------------|
+| Epic | 3 | 1 | epic-004 |
+| Feature | 12 | 1 | feature-013 |
+| Story | 45 | 6 | story-046 to story-051 |
+| Task | 67 | 10 | task-068 to task-077 |
+
+### Step 3: Update Counter BEFORE Creating Files
+
+Update `_counters.yaml` to the END of your reserved range before creating any files. This prevents collisions if the process is interrupted.
+
 ## ID Generation
 
 **CRITICAL: Use the ID counter file to ensure unique numbering.**
@@ -192,11 +230,124 @@ task: 0
 6. **Update states** to reflect actual progress
 7. **Use tags** for cross-cutting concerns (security, performance)
 
+## File Separation Rules
+
+**CRITICAL: Each work item type lives in its own file. Never embed child items.**
+
+| Rule | Correct | Wrong |
+|------|---------|-------|
+| Stories in feature | Create `story-XXX.md` files in `items/` | Listing stories in `_feature.md` |
+| Tasks in story | Create `task-XXX.md` files in `items/` | Listing tasks in `story-XXX.md` |
+| Tasks in feature | Create `task-XXX.md` with `parent: feature-XXX` | Listing tasks in `_feature.md` |
+
+**Why?**
+- UI parses individual files to build hierarchy
+- Embedded lists are not tracked as work items
+- State changes require separate files
+
+**Feature files (`_feature.md`):**
+- Contain overview, acceptance criteria, technical approach
+- Do NOT contain story or task definitions
+- Reference stories/tasks by ID if needed
+
+**Story files (`story-XXX.md`):**
+- Contain user story, acceptance criteria, technical notes
+- Do NOT contain task definitions
+- Tasks are separate files with `parent: story-XXX`
+
+## Task-Story Relationship
+
+Tasks should be children of stories (or features for cross-cutting work):
+
+**Correct hierarchy:**
+```
+Feature → Stories → Tasks
+task.parent: story-XXX  (appears under story in UI)
+```
+
+**Cross-cutting tasks:**
+```
+task.parent: feature-XXX  (testing, registration, integration)
+```
+
+**Wrong:**
+```
+task.parent: feature-XXX for story-specific work
+→ Task won't appear under its story in UI
+```
+
+## ID Generation - CRITICAL
+
+**IDs are GLOBAL across all features, not per-feature.**
+
+| Example | Result |
+|---------|--------|
+| `task-001` in feature-001, `task-001` in feature-006 | ❌ COLLISION |
+| `task-001` in feature-001, `task-009` in feature-006 | ✅ UNIQUE |
+
+**ALWAYS read `_counters.yaml` BEFORE creating ANY item.**
+
+## Minimum Item Requirements
+
+**CRITICAL: Every parent must have at least one child item.**
+
+| Parent | Minimum Children | Rule |
+|--------|------------------|------|
+| **Feature** | At least 1 story | Features without stories have no deliverable scope |
+| **Story** | At least 1 task | Stories without tasks have no actionable work |
+
+**Why?**
+- Features define WHAT to build; stories define WHO benefits and WHY
+- Stories define user value; tasks define HOW to implement
+- Empty parents create orphan work items in the kanban board
+- Tasks are the atomic unit of work that gets done
+
+**When creating features:** Always create at least one story, even for small features.
+
+**When creating stories:** Always create at least one task, even if it's a single implementation task.
+
+## Post-Creation Verification
+
+**AFTER creating stories, verify task coverage:**
+
+### Acceptance Criteria → Task Mapping
+
+For each story, create a mapping table:
+
+| Acceptance Criterion | Covered by Task | Status |
+|---------------------|-----------------|--------|
+| User can enter email | task-068 | ✅ |
+| Invalid credentials show error | task-068 | ✅ |
+| Successful login redirects | task-069 | ✅ |
+| Session persists across refresh | **MISSING** | ❌ |
+
+### Verification Steps
+
+1. **List all acceptance criteria** from the story
+2. **Map each criterion** to one or more tasks
+3. **Identify gaps** - any unmapped criteria need new tasks
+4. **Create missing tasks** before marking story as ready
+
+### Red Flags
+
+| Red Flag | Action |
+|----------|--------|
+| Story has 0 tasks | Create at least 1 task |
+| Acceptance criterion has no task | Create task to cover it |
+| Task covers multiple unrelated criteria | Split into focused tasks |
+| Task doesn't map to any criterion | Question if task is needed |
+
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
 | **Reusing existing IDs** | Always use `_counters.yaml` to get next ID |
+| **Using local IDs per feature** | IDs are GLOBAL - check counter first |
+| **Embedding stories in feature file** | Create separate `story-XXX.md` files |
+| **Embedding tasks in story file** | Create separate `task-XXX.md` files |
+| **Tasks assigned to feature instead of story** | Use `parent: story-XXX` for story-specific tasks |
+| **Features without stories** | Always create at least 1 story per feature |
+| **Stories without tasks** | Always create at least 1 task per story |
 | Creating files in wrong location | Always use `<PROJECT_ROOT>/.kanban/` |
 | Skipping acceptance criteria | Define criteria before implementation |
 | Features too large | Decompose into 3-7 stories |

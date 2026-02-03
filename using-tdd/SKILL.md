@@ -284,8 +284,26 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 - "Already spent X hours, deleting is wasteful"
 - "TDD is dogmatic, I'm being pragmatic"
 - "This is different because..."
+- **Tests silently skip** - Integration tests using `Assert.Ignore()` appear to pass but actually skip
 
 **All of these mean: Delete code. Start over with TDD.**
+
+### Silent Test Skips
+
+Tests that use `Assert.Ignore()` or similar for missing configuration can silently skip even when configuration exists - if the test reads from the wrong source.
+
+**Common mistake:** Using `ConfigurationBuilder` (reads appsettings.json/env vars) instead of `TestContext.Parameters` (reads runsettings).
+
+**Symptoms:**
+- Test summary shows "passed" but integration tests never actually ran
+- Tests pass suspiciously fast
+- No SharePoint/external service calls in logs
+
+**Prevention:**
+- Verify test reads from correct configuration source for your test framework
+- Check test summary: "total: X; skipped: Y" - if Y > 0, investigate why
+- Never use fallback values for required config - throw exceptions instead
+- When tests pass, confirm they actually executed (check logs, verify side effects)
 
 ## Example: Bug Fix
 
