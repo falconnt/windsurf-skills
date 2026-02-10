@@ -354,6 +354,26 @@ For each story, create a mapping table:
 | Not updating state | Change state when starting/finishing work |
 | Creating standalone when epic exists | Nest features under parent epic |
 
+## Archiving
+
+Completed items can be archived to reduce board clutter using `/archive-kanban`.
+
+**How it works:**
+- Adds `archived: true` and `archived_date: YYYY-MM-DD` to YAML frontmatter
+- Files stay in place — no moves or deletions
+- All workflows skip items where `archived: true`
+- Only epics and features (with ALL children `Done`) are archivable
+- Archiving a parent archives all descendants recursively
+- Fully reversible by removing the `archived` fields
+
+**Archivable criteria:**
+| Level | Requirement |
+|-------|-------------|
+| **Epic** | Epic is `Done` AND all child features, stories, bugfixes, tasks are `Done` |
+| **Feature** | Feature is `Done` AND all child stories, bugfixes, tasks are `Done` |
+
+**When scanning items, always skip `archived: true` items** — treat them as if they don't exist on the active board.
+
 ## State Transitions
 
 ```
